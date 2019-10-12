@@ -1,0 +1,19 @@
+language: go
+go:
+  - 1.13.x
+env:
+  global:
+    secure: sYVRiS12dO4flBGwNUes/rQ/pPiRZS0m1Chw/R/56q8KWy7MwpHrwmJwTNOjmkggT0AyHjCi+fjK+JhgLmseyxc6MVi7b2MXBVSMw9Rovcv4qRwZw3i1L7Lahn9TCp/pQz+hRyiQ3Tn/k1zrs9VVQjwqS5ewtyYTkx34S1cLW7GiFwvA6K0PE6VK6AK8cWBTgujIAKBcH2rfZ86UheMVxkn9vM0qcu20uCgdcb0udH8iO5RnIYvt9qGUONG29d1aSXTg2dnl9uPNOg26Hy17JiXkQ0oLMpNa94HcMPBvh2zlSMvym1eiHVs8WXU7duGqD+WgJt2KY1zLR5oKO6J4JJN/s2nmUDgZxOYqfQozzuwRxCDyVtRvhLjWUwQ/CeKMV/UlDh9iJ8CD4yKfSTK919YVxdJEJ4nTvWkECx2x7InhC8r8gvQS7wzmUJqr6XiVd0d/WahQ2KO3n8RtLf7aoXtNjseJDQyyjdT9wxoSORkq9XefujzWL1wOa/2qbKSDnsDR/e7Iy/HtHb32tV+9SpFKzQDKuVIF+o1UTd8HT8wJ5pVRmrIxMaHfHqA+/xtnZVTuWAPKf1jWkZ/tvH14Tc2FjEW/Ibxx93x9/VKPX/f7JIav/UKnCMJFwcUxUr1vtOZ8hp4Qw+ie+TcyBBbCQAwyFQyqLYFvzD8V07UhO3Y=
+install: true
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: sYVRiS12dO4flBGwNUes/rQ/pPiRZS0m1Chw/R/56q8KWy7MwpHrwmJwTNOjmkggT0AyHjCi+fjK+JhgLmseyxc6MVi7b2MXBVSMw9Rovcv4qRwZw3i1L7Lahn9TCp/pQz+hRyiQ3Tn/k1zrs9VVQjwqS5ewtyYTkx34S1cLW7GiFwvA6K0PE6VK6AK8cWBTgujIAKBcH2rfZ86UheMVxkn9vM0qcu20uCgdcb0udH8iO5RnIYvt9qGUONG29d1aSXTg2dnl9uPNOg26Hy17JiXkQ0oLMpNa94HcMPBvh2zlSMvym1eiHVs8WXU7duGqD+WgJt2KY1zLR5oKO6J4JJN/s2nmUDgZxOYqfQozzuwRxCDyVtRvhLjWUwQ/CeKMV/UlDh9iJ8CD4yKfSTK919YVxdJEJ4nTvWkECx2x7InhC8r8gvQS7wzmUJqr6XiVd0d/WahQ2KO3n8RtLf7aoXtNjseJDQyyjdT9wxoSORkq9XefujzWL1wOa/2qbKSDnsDR/e7Iy/HtHb32tV+9SpFKzQDKuVIF+o1UTd8HT8wJ5pVRmrIxMaHfHqA+/xtnZVTuWAPKf1jWkZ/tvH14Tc2FjEW/Ibxx93x9/VKPX/f7JIav/UKnCMJFwcUxUr1vtOZ8hp4Qw+ie+TcyBBbCQAwyFQyqLYFvzD8V07UhO3Y=
+  file_glob: true
+  file: dist/*
+  on:
+    tags: true
+  branches:
+    only:
+      - master
