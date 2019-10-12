@@ -70,7 +70,7 @@ func (file MediaFile) getPartFilePrefixFromFilename() string {
 }
 
 func (file MediaFile) getFilePrefixFromExif() string {
-	f, err := os.Open(filepath.Join(file.In.Filename, file.In.Path))
+	f, err := os.Open(filepath.Join(file.In.Path, file.In.Filename))
 
 	if err != nil {
 		log.Fatal(err)
