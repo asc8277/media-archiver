@@ -1,4 +1,4 @@
-module github.com/asc8277/thoschmiphotos-wallpaper
+module github.com/asc8277/media-archiver
 
 go 1.12
 
