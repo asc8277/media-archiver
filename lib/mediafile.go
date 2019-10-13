@@ -4,73 +4,104 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/rwcarlsen/goexif/exif"
 )
 
-// MediaFile media file
-type MediaFile struct {
-	In  File
-	Out File
+// mediaFile media file
+type mediaFile struct {
+	in  file
+	out file
+}
+
+func (mf *mediaFile) processVideo() string {
+	fInPath := filepath.Join(mf.in.path, mf.in.name)
+	mf.setNewVideoFilename()
+	fOutPath := filepath.Join(mf.out.path, mf.out.name)
+
+	out, err := exec.Command("HandBrakeCLI", "-i", fInPath, "-o", fOutPath, "-e", "x265", "-q", "22", "-f", "av_mp4", "--comb-detect", "--decomb", "-a", "1", "-E", "copy:aac", "--loose-anamorphic").CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")
+	return result[len(result)-9]
+}
+
+func (mf *mediaFile) processImage() string {
+	fInPath := filepath.Join(mf.in.path, mf.in.name)
+	mf.setNewImageFilename()
+	fOutPath := filepath.Join(mf.out.path, mf.out.name)
+
+	out, err := exec.Command("jpeg-recompress", "-a", "-q", "high", "-n", "60", "-x", "95", fInPath, fOutPath).CombinedOutput()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")
+	return fmt.Sprintf("%s %s", result[len(result)-3], result[len(result)-2])
 }
 
 // SetNewVideoFilename new video filename
-func (file MediaFile) SetNewVideoFilename() MediaFile {
-	fext := filepath.Ext(file.In.Filename)
-	fpre := filepath.Base(file.In.Filename[0 : len(file.In.Filename)-len(fext)])
+func (mf *mediaFile) setNewVideoFilename() mediaFile {
+	fext := filepath.Ext(mf.in.name)
+	fpre := filepath.Base(mf.in.name[0 : len(mf.in.name)-len(fext)])
 
-	prefix := file.getFilePrefixFromFilename()
+	prefix := mf.getFilePrefixFromFilename()
 	if prefix == "" {
-		prefix = file.getPartFilePrefixFromFilename()
+		prefix = mf.getPartFilePrefixFromFilename()
 	}
 
-	file.Out.Filename = fmt.Sprintf("%s_%s.%s", prefix, fpre, "mp4")
+	mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "mp4")
 
-	return file
+	return *mf
 }
 
 // SetNewImageFilename new image filename
-func (file MediaFile) SetNewImageFilename() MediaFile {
-	fext := filepath.Ext(file.In.Filename)
-	fpre := filepath.Base(file.In.Filename[0 : len(file.In.Filename)-len(fext)])
+func (mf *mediaFile) setNewImageFilename() mediaFile {
+	fext := filepath.Ext(mf.in.name)
+	fpre := filepath.Base(mf.in.name[0 : len(mf.in.name)-len(fext)])
 
-	prefix := file.getFilePrefixFromExif()
+	prefix := mf.getFilePrefixFromExif()
 	if prefix == "" {
-		prefix = file.getFilePrefixFromFilename()
+		prefix = mf.getFilePrefixFromFilename()
 	}
 	if prefix == "" {
-		prefix = file.getPartFilePrefixFromFilename()
+		prefix = mf.getPartFilePrefixFromFilename()
 	}
 
-	file.Out.Filename = fmt.Sprintf("%s_%s.%s", prefix, fpre, "jpg")
+	mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "jpg")
 
-	return file
+	return *mf
 }
 
-func (file MediaFile) getFilePrefixFromFilename() string {
+func (mf *mediaFile) getFilePrefixFromFilename() string {
 	r, err := regexp.Compile(`\d\d\d\d\d\d\d\d_\d\d\d\d\d\d`)
 	if err != nil {
 		log.Fatal(err)
 		return ""
 	}
 
-	return r.FindString(file.In.Filename)
+	return r.FindString(mf.in.name)
 }
 
-func (file MediaFile) getPartFilePrefixFromFilename() string {
+func (mf *mediaFile) getPartFilePrefixFromFilename() string {
 	r, err := regexp.Compile(`\d\d\d\d\d\d\d\d`)
 	if err != nil {
 		log.Fatal(err)
 		return ""
 	}
 
-	return r.FindString(file.In.Filename)
+	return r.FindString(mf.in.name)
 }
 
-func (file MediaFile) getFilePrefixFromExif() string {
-	f, err := os.Open(filepath.Join(file.In.Path, file.In.Filename))
+func (mf *mediaFile) getFilePrefixFromExif() string {
+	f, err := os.Open(filepath.Join(mf.in.path, mf.in.name))
 
 	if err != nil {
 		log.Fatal(err)

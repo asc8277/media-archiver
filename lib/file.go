@@ -5,15 +5,13 @@ import (
 	"strings"
 )
 
-// File file
-type File struct {
-	Filename string
-	Path     string
+type file struct {
+	name string
+	path string
 }
 
-// GetFileExtension get file extension
-func (file File) GetFileExtension() string {
-	fpathExt := filepath.Ext(file.Filename)
+func (file *file) getFileExtension() string {
+	fpathExt := filepath.Ext(file.name)
 
 	ext := ""
 	if len(fpathExt) > 0 {
