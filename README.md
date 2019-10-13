@@ -4,11 +4,17 @@
 
 
 # media-archiver
-...
+Little utility to process media files into smaller, yet high quality files for archiving purposes.
+Needs the following commands available in PATH
+* jpeg-recompress ([jpeg-archive](https://github.com/danielgtaylor/jpeg-archive)) and
+* HandBrakeCLI ([handbrake](https://handbrake.fr))
 
 ## Usage
 
-[download latest release](https://github.com/asc8277/media-archiver/releases/latest) and ...
+[download latest release](https://github.com/asc8277/media-archiver/releases/latest) and run
+```
+media-archiver yourpath
+```
 
 ## License
 
