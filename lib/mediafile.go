@@ -23,7 +23,7 @@ func (mf *mediaFile) processVideo() string {
 	mf.setNewVideoFilename()
 	fOutPath := filepath.Join(mf.out.path, mf.out.name)
 
-	out, err := exec.Command("HandBrakeCLI", "-i", fInPath, "-o", fOutPath, "-e", "x265", "-q", "22", "-f", "av_mp4", "--comb-detect", "--decomb", "-a", "1", "-E", "copy:aac", "--loose-anamorphic").CombinedOutput()
+	out, err := exec.Command("HandBrakeCLI", "-i", fInPath, "-o", fOutPath, "-e", "x264", "-q", "23", "-f", "av_mp4", "--comb-detect", "--decomb", "-a", "1", "-E", "copy:aac", "--loose-anamorphic").CombinedOutput()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +57,11 @@ func (mf *mediaFile) setNewVideoFilename() mediaFile {
 		prefix = mf.getPartFilePrefixFromFilename()
 	}
 
-	mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "mp4")
+	if strings.HasPrefix(fpre, prefix) {
+		mf.out.name = fmt.Sprintf("%s.%s", fpre, "mp4")
+	} else {
+		mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "mp4")
+	}
 
 	return *mf
 }
@@ -75,27 +79,23 @@ func (mf *mediaFile) setNewImageFilename() mediaFile {
 		prefix = mf.getPartFilePrefixFromFilename()
 	}
 
-	mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "jpg")
+	if strings.HasPrefix(fpre, prefix) {
+		mf.out.name = fmt.Sprintf("%s.%s", fpre, "jpg")
+	} else {
+		mf.out.name = fmt.Sprintf("%s_%s.%s", prefix, fpre, "jpg")
+	}
 
 	return *mf
 }
 
 func (mf *mediaFile) getFilePrefixFromFilename() string {
-	r, err := regexp.Compile(`\d\d\d\d\d\d\d\d_\d\d\d\d\d\d`)
-	if err != nil {
-		log.Fatal(err)
-		return ""
-	}
+	r, _ := regexp.Compile(`\d\d\d\d\d\d\d\d_\d\d\d\d\d\d`)
 
 	return r.FindString(mf.in.name)
 }
 
 func (mf *mediaFile) getPartFilePrefixFromFilename() string {
-	r, err := regexp.Compile(`\d\d\d\d\d\d\d\d`)
-	if err != nil {
-		log.Fatal(err)
-		return ""
-	}
+	r, _ := regexp.Compile(`\d\d\d\d\d\d\d\d`)
 
 	return r.FindString(mf.in.name)
 }
@@ -104,19 +104,16 @@ func (mf *mediaFile) getFilePrefixFromExif() string {
 	f, err := os.Open(filepath.Join(mf.in.path, mf.in.name))
 
 	if err != nil {
-		log.Fatal(err)
 		return ""
 	}
 
 	x, err := exif.Decode(f)
 	if err != nil {
-		log.Fatal(err)
 		return ""
 	}
 
 	tm, err := x.DateTime()
 	if err != nil {
-		log.Fatal(err)
 		return ""
 	}
 

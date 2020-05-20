@@ -14,7 +14,6 @@ import (
 var supportedImages = map[string]bool{
 	"jpg":  true,
 	"jpeg": true,
-	"png":  true,
 }
 
 var supportedVideos = map[string]bool{
