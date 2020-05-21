@@ -17,7 +17,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "--version":
-		fmt.Println(Version)
+		fmt.Println(version())
 	case "--help":
 		fmt.Println(help())
 	default:
