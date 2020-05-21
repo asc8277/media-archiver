@@ -11,14 +11,19 @@ import (
 	"time"
 )
 
-var supportedImages = map[string]bool{
-	"jpg":  true,
-	"jpeg": true,
-}
+type MediaFormat int
 
-var supportedVideos = map[string]bool{
-	"mp4": true,
-	"m4v": true,
+const (
+	Image MediaFormat = iota
+	Video
+)
+
+var supportedFormats = map[string]MediaFormat{
+	"jpg":  Image,
+	"jpeg": Image,
+	"png":  Image,
+	"mp4":  Video,
+	"m4v":  Video,
 }
 
 // Archiver archiver
@@ -43,9 +48,9 @@ func (ma *Archiver) Process() {
 		mfile := file{name: fname, path: ma.InPath}
 		ext := mfile.getFileExtension()
 
-		if supportedImages[ext] {
+		if supportedFormats[ext] == Image {
 			images = append(images, fname)
-		} else if supportedVideos[ext] {
+		} else if supportedFormats[ext] == Video {
 			videos = append(videos, fname)
 		} else {
 			skipped = append(skipped, fname)
@@ -90,10 +95,10 @@ func (ma *Archiver) processImages(filenames []string, inPath string, outPath str
 			for filename := range tasks {
 				log.Print(fmt.Sprintf("%s: process", filename))
 
-				mf := mediaFile{in: file{name: filename, path: inPath}, out: file{path: outPath}}
-				result := mf.processImage()
+				imf := imageFile{in: file{name: filename, path: inPath}, out: file{path: outPath}}
+				result := imf.process()
 
-				log.Print(fmt.Sprintf("%s -> %s : %s", filename, mf.out.name, result))
+				log.Print(fmt.Sprintf("%s -> %s : %s", filename, imf.out.name, result))
 			}
 		}()
 	}
@@ -109,9 +114,9 @@ func (ma *Archiver) processVideos(filenames []string, inPath string, outPath str
 	for _, filename := range filenames {
 		log.Print(fmt.Sprintf("%s: process", filename))
 
-		mf := mediaFile{in: file{name: filename, path: inPath}, out: file{path: outPath}}
-		result := mf.processVideo()
+		vmf := videoFile{in: file{name: filename, path: inPath}, out: file{path: outPath}}
+		result := vmf.process()
 
-		log.Print(fmt.Sprintf("%s -> %s : %s", filename, mf.out.name, result))
+		log.Print(fmt.Sprintf("%s -> %s : %s", filename, vmf.out.name, result))
 	}
 }

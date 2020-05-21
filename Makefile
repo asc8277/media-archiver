@@ -1,6 +1,7 @@
  # Go parameters
+BUILD_VERSION=$(shell git describe --tags)
 GOCMD=GO111MODULE=on GOARCH=amd64 go
-GOBUILD=$(GOCMD) build -v
+GOBUILD=$(GOCMD) build -v -ldflags "-X main.Version=${BUILD_VERSION}"
 SOURCE_NAME=media-archiver.go
 BINARY_NAME=dist/media-archiver
 		
