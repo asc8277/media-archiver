@@ -2,9 +2,8 @@ package mediaarchiver
 
 import (
 	"fmt"
-	"image"
 	"image/jpeg"
-	"log"
+	"image/png"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,17 +15,19 @@ import (
 type imageFile mediaFile
 
 func (imf *imageFile) process() string {
+	imf.setNewFilename()
+
 	if imf.in.getFileExtension() == "png" {
 		imf.preProcessPng()
 	}
+
 	fInPath := imf.in.getFullPath()
-	imf.setNewFilename()
 	fOutPath := imf.out.getFullPath()
 
 	out, err := exec.Command("jpeg-recompress", "-a", "-q", "high", "-n", "60", "-x", "95", fInPath, fOutPath).CombinedOutput()
 
 	if err != nil {
-		log.Fatal(err)
+		return err.Error()
 	}
 
 	result := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")
@@ -75,14 +76,13 @@ func (imf *imageFile) getFilePrefixFromExif() string {
 
 func (imf *imageFile) preProcessPng() imageFile {
 	f, _ := os.Open(imf.in.getFullPath())
-	t, _, _ := image.Decode(f)
+	t, _ := png.Decode(f)
 
-	filename := imf.in.getFileNameWithoutExtension() + ".jpg"
-	f, _ = os.Create(filepath.Join(imf.in.path, filename))
+	f, _ = os.Create(filepath.Join(imf.out.getFullPath()))
+
+	imf.in = imf.out
 
 	jpeg.Encode(f, t, &jpeg.Options{Quality: 100})
-
-	imf.in.name = filename
 
 	return *imf
 }

@@ -2,7 +2,6 @@ package mediaarchiver
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 )
@@ -16,7 +15,7 @@ func (vmf *videoFile) process() string {
 
 	out, err := exec.Command("HandBrakeCLI", "-i", fInPath, "-o", fOutPath, "-e", "x264", "-q", "23", "-f", "av_mp4", "--comb-detect", "--decomb", "-a", "1", "-E", "copy:aac", "--loose-anamorphic").CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		return err.Error()
 	}
 
 	result := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")

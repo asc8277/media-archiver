@@ -32,7 +32,7 @@ func (file *file) getFullPath() string {
 }
 
 func (file *file) getFileNameWithoutExtension() string {
-	return filepath.Base(file.name[0 : len(file.name)-len(file.getFileExtension())])
+	return filepath.Base(file.name[0 : len(file.name)-len(filepath.Ext(file.name))])
 }
 
 func (file *file) getFilePrefixFromFilename() string {

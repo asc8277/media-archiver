@@ -14,7 +14,7 @@ import (
 type MediaFormat int
 
 const (
-	Image MediaFormat = iota
+	Image MediaFormat = iota + 1
 	Video
 )
 
