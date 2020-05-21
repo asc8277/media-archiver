@@ -15,28 +15,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	command := os.Args[1]
-
-	switch command {
-	case "version":
+	switch os.Args[1] {
+	case "--version":
 		fmt.Println(Version)
-	case "process":
-		if len(os.Args) < 3 {
-			fmt.Println(help())
-			os.Exit(1)
-		}
-		archiver := ma.Archiver{InPath: os.Args[2]}
-		archiver.Process()
-	case "help":
+	case "--help":
 		fmt.Println(help())
 	default:
-		fmt.Println(help())
-		os.Exit(1)
+		archiver := ma.Archiver{InPath: os.Args[1]}
+		archiver.Process()
 	}
 }
 
 func help() string {
-	return fmt.Sprintf("%s, valid commands: process <dir>, version, help", version())
+	return fmt.Sprintf("%s, usage: media-archiver <dir>, --version, --help", version())
 }
 
 func version() string {
