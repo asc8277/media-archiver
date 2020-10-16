@@ -24,6 +24,8 @@ var supportedFormats = map[string]MediaFormat{
 	"png":  Image,
 	"mp4":  Video,
 	"m4v":  Video,
+	"mov": 	Video,
+	"avi":	Video,
 }
 
 // Archiver archiver

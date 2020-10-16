@@ -2,8 +2,11 @@ package mediaarchiver
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
+
+	cp "github.com/nmrshll/go-cp"
 )
 
 type videoFile mediaFile
@@ -18,11 +21,16 @@ func (vmf *videoFile) process() string {
 		return err.Error()
 	}
 
-	result := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")
-	return result[len(result)-9]
+	resultArr := strings.Split(strings.ReplaceAll(string(out), "\r", ""), "\n")
+	result := resultArr[len(resultArr)-9]
+
+	if vmf.in.getFileExtension() == "mp4" {
+		result = result + vmf.checkFileSizes()
+	}
+
+	return result
 }
 
-// SetNewVideoFilename new video filename
 func (vmf *videoFile) setNewFilename() videoFile {
 	fpre := vmf.in.getFileNameWithoutExtension()
 
@@ -38,4 +46,24 @@ func (vmf *videoFile) setNewFilename() videoFile {
 	}
 
 	return *vmf
+}
+
+func (vmf *videoFile) checkFileSizes() string {
+	fInPath := vmf.in.getFullPath()
+	fOutPath := vmf.out.getFullPath()
+
+	inFi, _ := os.Stat(fInPath)
+	inSize := inFi.Size()
+
+	outFi, _ := os.Stat(fOutPath)
+	outSize := outFi.Size()
+
+	if outSize > inSize {
+		os.Remove(fOutPath)
+		err := cp.CopyFile(fInPath, fOutPath)
+
+		return err.Error()
+	}
+
+	return ""
 }
