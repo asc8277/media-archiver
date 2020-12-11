@@ -1,0 +1,23 @@
+on:
+  create:
+    tags:
+      - 'v*'
+name: release
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+    steps:
+      - name: make
+        uses: cedrickring/golang-action@1.6.0
+        env:
+          GO111MODULE: "on"
+      - name: create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/media-archiver*
+        env:
+          GITHUB_TOKEN: $
