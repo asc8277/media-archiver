@@ -19,4 +19,4 @@ jobs:
         with:
           files: dist/media-archiver*
         env:
-          GITHUB_TOKEN: $
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
